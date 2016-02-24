@@ -1,34 +1,28 @@
 # Hprose for Perl
 
-[![Join the chat at https://gitter.im/hprose/hprose-perl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hprose/hprose-perl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+### 安装
+Linux
+```
+perl Makefile.PL
+make
+make install
+```
 
-*Hprose* is a High Performance Remote Object Service Engine.
+Window 带编译环境
+```
+perl Makefile.PL
+dmake
+dmake install
+```
 
-It is a modern, lightweight, cross-language, cross-platform, object-oriented, high performance, remote dynamic communication middleware. It is not only easy to use, but powerful. You just need a little time to learn, then you can use it to easily construct cross language cross platform distributed application system.
-
-*Hprose* supports many programming languages, for example:
-
-* AAuto Quicker
-* ActionScript
-* ASP
-* C++
-* Dart
-* Delphi/Free Pascal
-* dotNET(C#, Visual Basic...)
-* Golang
-* Java
-* JavaScript
-* Node.js
-* Objective-C
-* Perl
-* PHP
-* Python
-* Ruby
-* ...
-
-Through *Hprose*, You can conveniently and efficiently intercommunicate between those programming languages.
-
-This project is the implementation of Hprose for Perl.
 
 ### Usage
-本版本只实现了客户端的功能，还没有服务端的部分。
+本版本只实现了客户端的功能，还没有服务端的部分。所以不要直接
+```
+use Hprose;
+```
+而是
+```
+use Hprose::Client;
+```
+具体使用可以参照Hprose::Client中的文档
