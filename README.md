@@ -29,3 +29,6 @@ It is a modern, lightweight, cross-language, cross-platform, object-oriented, hi
 Through *Hprose*, You can conveniently and efficiently intercommunicate between those programming languages.
 
 This project is the implementation of Hprose for Perl.
+
+### Usage
+本版本只实现了客户端的功能，还没有服务端的部分。
