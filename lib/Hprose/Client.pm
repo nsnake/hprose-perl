@@ -32,7 +32,6 @@ use Hprose::Filter;
 use IO::String;
 our $VERSION = '0.2.0';
 
-
 #\$body, $function, $arguments, $byRef
 sub _doOutput {
     my $self = $_[0];
@@ -96,6 +95,42 @@ sub _doInput {
         throw $error;
     }
     return $result;
+}
+
+sub setFilter {
+    shift->{'filter'} = shift || 0;
+}
+
+sub getFilter {
+    return shift->{'filter'};
+}
+
+sub setSimpleMode {
+    shift->{'simple'} = shift || 1;
+}
+
+sub getSimpleMode {
+    return shift->{'simple'};
+}
+
+sub setKeepAlive {
+    my ( $self, $keepalive ) = @_;
+    $self->{'keepAlive'} = $keepalive;
+}
+
+sub getKeepAlive {
+    my $self = shift;
+    return $self->{'keepAlive'};
+}
+
+sub AUTOLOAD {
+    my $self = shift;
+    my $cb   = pop;
+    my $name = our $AUTOLOAD;
+    return if $name =~ /::DESTROY$/;
+    $name =~ /.*::(\w*)/;
+    $name = $1;
+    $self->invoke( $name, \@_, $cb );
 }
 
 1;

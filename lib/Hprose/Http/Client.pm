@@ -103,48 +103,12 @@ sub getTimeout {
     return $AnyEvent::HTTP::TIMEOUT;
 }
 
-sub setKeepAlive {
-    my ( $self, $keepalive ) = @_;
-    $self->{'keepAlive'} = $keepalive;
-}
-
-sub getKeepAlive {
-    my $self = shift;
-    return $self->{'keepAlive'};
-}
-
 #socks4://10.0.0.1:1080
 #socks5://root:123@10.0.0.2:1080
 #socks4a://85.224.100.1:9010
 sub setProxy {
     my $self = shift;
     $self->{'proxy'} = shift;
-}
-
-sub setFilter {
-    shift->{'filter'} = shift || 0;
-}
-
-sub getFilter {
-    return shift->{'filter'};
-}
-
-sub setSimpleMode {
-    shift->{'simple'} = shift || 1;
-}
-
-sub getSimpleMode {
-    return shift->{'simple'};
-}
-
-sub AUTOLOAD {
-    my $self = shift;
-    my $cb   = pop;
-    my $name = our $AUTOLOAD;
-    return if $name =~ /::DESTROY$/;
-    $name =~ /.*::(\w*)/;
-    $name = $1;
-    $self->invoke( $name, \@_, $cb );
 }
 
 1;
