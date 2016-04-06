@@ -75,7 +75,7 @@ sub addFunction {
 
     $self->{'calls'}->{$name} = Hprose::RemoteCall->new(
         func   => $func,
-        mode   => 'ResultMode::Normal',
+        mode   => Hprose::ResultMode->Normal,
         simple => 0,
         async  => 0,
     );
@@ -171,17 +171,17 @@ sub afterInvoke {
     if ( $self->{'onAfterInvoke'} ) {
         $self->{'onAfterInvoke'}->( $name, $args, $byref, $result, $context );
     }
-    if ( $mode eq 'ResultMode::RawWithEndTag' ) {
+    if ( $mode == Hprose::ResultMode->RawWithEndTag ) {
         return $self->outputFilter( $result, $context );
     }
-    elsif ( $mode eq 'ResultMode::Raw' ) {
+    elsif ( $mode == Hprose::ResultMode->Raw ) {
         $output->write($result);
     }
     else {
 
         my $writer = Hprose::Writer->new( $output, $simple );
         $output->write( Hprose::Tags->Result );
-        if ( $mode eq 'ResultMode::Serialized' ) {
+        if ( $mode == Hprose::ResultMode->Serialized ) {
             $output->write($result);
         }
         else {
@@ -215,6 +215,7 @@ sub _doFunctionList {
 }
 
 package Hprose::RemoteCall;
+use Hprose::ResultMode;
 
 sub new {
     my ( $class, %args ) = @_;
@@ -237,8 +238,8 @@ sub new {
     return $self;
 }
 
-sub simple { return 0; }
+sub simple { return $_[0]->{'simple'}; }
 sub func   { return $_[0]->{'func'} }
 sub async  { return 0; }
-sub mode   { return 'ResultMode::Normal'; }
+sub mode   { return $_[0]->{'mode'} }
 1;
