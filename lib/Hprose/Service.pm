@@ -37,7 +37,7 @@ sub new {
     my ( $class, %args ) = @_;
     my $self = {
         calls          => {},
-        names          => {},
+        names          => [],
         filters        => {},
         simple         => 0,
         debug          => 0,
@@ -72,7 +72,9 @@ sub addFunction {
         throw Hprose::Exception('Argument func must be a function');
     }
     my $name = $alias ? lc($alias) : lc( sub_name($func) );
-
+    if ( !$self->{'calls'}->{$name} ) {
+        push @{ $self->{'names'} }, $name;
+    }
     $self->{'calls'}->{$name} = Hprose::RemoteCall->new(
         func   => $func,
         mode   => Hprose::ResultMode->Normal,
@@ -119,14 +121,6 @@ sub _doInvoke {
                 $byref = 1;
                 $tag   = $input->getc();
             }
-
-            #if ( $call->byref ) {
-            #my @_args = ();
-            #foreach ( @{$args} ) {
-            #    push( @_args, $_ );
-            #}
-            #$args = @_args;
-            #}
         }
         if (   ( $tag ne Hprose::Tags->End )
             && ( $tag ne Hprose::Tags->Call ) )
@@ -141,7 +135,14 @@ sub _doInvoke {
             $self->{'onBeforeInvoke'}->( $name, $args, $byref, $context );
         }
 
-        my $result = $call->{'func'}($args);
+        my $result;
+        if ( !$call->byref ) {
+            $result = $call->{'func'}( @{$args} );
+        }
+        else {
+            $result = $call->{'func'}($args);
+        }
+
         $result = $self->afterInvoke(
             $name,    $args,   $byref,  $mode, $simple,
             $context, $result, $output, 0
@@ -207,11 +208,11 @@ sub _doFunctionList {
     my $stream = IO::String->new();
     my $writer = Hprose::Writer->new( $stream, 1 );
     $stream->print( Hprose::Tags->Functions );
-    $writer->write_array('Demo');
+    $writer->write_array( @{ $self->{'names'} } );
     $stream->write( Hprose::Tags->End );
     my $data = ${ $stream->string_ref };
     $stream->close();
-    return _outputFilter( $data, $context );
+    return $self->outputFilter( $data, $context );
 }
 
 package Hprose::RemoteCall;
@@ -223,7 +224,8 @@ sub new {
         func   => $args{'func'},
         mode   => $args{'mode'},
         simple => $args{'simple'},
-        async  => $args{'async'}
+        async  => $args{'async'},
+        byref  => 0
     };
     if ( ref $self->{'func'} eq 'ARRAY' ) {
 
@@ -242,4 +244,5 @@ sub simple { return $_[0]->{'simple'}; }
 sub func   { return $_[0]->{'func'} }
 sub async  { return 0; }
 sub mode   { return $_[0]->{'mode'} }
+sub byref  { return $_[0]->{'byref'} }
 1;
